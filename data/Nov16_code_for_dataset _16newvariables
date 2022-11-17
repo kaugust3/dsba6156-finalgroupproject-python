@@ -1,4 +1,8 @@
-# -*- coding: utf-8 -*-
+# this dataset (created when running this code) was built on already updated dataset which had 2 external variables already added -PMB
+#file was too large to upload so is linked in our google drive https://drive.google.com/file/d/1bcS82fMFQKtKm2JYQzCA7VHNTRdqU4wa/view?usp=sharing
+#____________________________
+
+
 """
 This code has 3 main sections
 1)add external variables
@@ -12,7 +16,7 @@ This code has 3 main sections
 import numpy as np, pandas as pd
 
 # Load the data and replace with your CSV file path
-df = pd.read_csv("C:/Users/BarriP01/Desktop/DatasetwithMedIncome TV.csv")
+#..........df = pd.read_csv("C:-----------DatasetwithMedIncome TV.csv")
 print(df.head())
 print(df.info())
 

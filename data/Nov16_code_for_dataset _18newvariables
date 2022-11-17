@@ -1,0 +1,370 @@
+# -*- coding: utf-8 -*-
+"""
+This code has 3 main sections
+1)add external variables
+2)add imputed versions of external variables
+3)recode income brackets (variable in original dataset) and add classifiers for income
+
+@author: Patricia Marie Barrier
+"""
+
+# Load packages
+import numpy as np, pandas as pd
+
+# Load the data and replace with your CSV file path
+df = pd.read_csv("C:/Users/BarriP01/Desktop/DatasetwithMedIncome TV.csv")
+print(df.head())
+print(df.info())
+
+#---------------------------------------------------------------------
+#1)add external variables
+
+#add population of each city
+def categorise(row):
+    if row['store_city'] == 'Portland' and row['store_state'] == 'OR':
+        return 653000
+    elif row['store_city'] == 'Salem' and row['store_state'] == 'OR':
+        return 176000
+    elif row['store_city'] == 'Beverly Hills' and row['store_state'] == 'CA':
+        return 33800
+    elif row['store_city'] == 'Los Angeles' and row['store_state'] == 'CA':
+        return 3980000
+    elif row['store_city'] == 'San Francisco' and row['store_state'] == 'CA':
+        return 882000
+    elif row['store_city'] == 'Bellingham' and row['store_state'] == 'WA':
+        return 91500
+    elif row['store_city'] == 'Seattle' and row['store_state'] == 'WA':
+        return 745000
+    elif row['store_city'] == 'Spokane' and row['store_state'] == 'WA':
+        return 229000
+    elif row['store_city'] == 'Tacoma' and row['store_state'] == 'WA':
+        return 219000
+    elif row['store_city'] == 'Bremerton' and row['store_state'] == 'WA':
+        return 43500
+    elif row['store_city'] == 'Orizaba' and row['store_state'] == 'Veracruz':
+        return 355000   
+    elif row['store_city'] == 'Merida' and row['store_state'] == 'Yucatan':
+        return 892000
+    elif row['store_city'] == 'Hidalgo' and row['store_state'] == 'Zacatecas':
+        return 310000
+    elif row['store_city'] == 'Mexico City' and row['store_state'] == 'DF':
+        return 125000000
+    elif row['store_city'] == 'Camacho' and row['store_state'] == 'Zacatecas':
+        return 310000
+    elif row['store_city'] == 'Guadalajara' and row['store_state'] == 'Jalisco':
+        return 1460000
+    elif row['store_city'] == 'Acapulco' and row['store_state'] == 'Guerrero':
+        return 673000
+    elif row['store_city'] == 'Vancouver' and row['store_state'] == 'BC':
+        return 631000
+    elif row['store_city'] == 'Victoria' and row['store_state'] == 'BC':
+        return 80000
+df['population_city_EXTERNAL'] = df.apply(lambda row: categorise(row), axis=1)
+
+#add external cost living total with rent family of 4 per month by city
+def categorise(row):
+    if row['store_city'] == 'Portland' and row['store_state'] == 'OR':
+        return 5426
+    elif row['store_city'] == 'Salem' and row['store_state'] == 'OR':
+        return 4545
+    elif row['store_city'] == 'Beverly Hills' and row['store_state'] == 'CA':
+        return 5173
+    elif row['store_city'] == 'Los Angeles' and row['store_state'] == 'CA':
+        return 6522
+    elif row['store_city'] == 'San Francisco' and row['store_state'] == 'CA':
+        return 7268
+    elif row['store_city'] == 'Bellingham' and row['store_state'] == 'WA':
+        return 5130
+    elif row['store_city'] == 'Seattle' and row['store_state'] == 'WA':
+        return 6193
+    elif row['store_city'] == 'Spokane' and row['store_state'] == 'WA':
+        return 4583
+    elif row['store_city'] == 'Tacoma' and row['store_state'] == 'WA':
+        return 5735
+    elif row['store_city'] == 'Bremerton' and row['store_state'] == 'WA':
+        return 5237
+    elif row['store_city'] == 'Orizaba' and row['store_state'] == 'Veracruz':
+        return 1592   
+    elif row['store_city'] == 'Merida' and row['store_state'] == 'Yucatan':
+        return 1891
+    elif row['store_city'] == 'Hidalgo' and row['store_state'] == 'Zacatecas':
+        return 1509
+    elif row['store_city'] == 'Mexico City' and row['store_state'] == 'DF':
+        return 2223
+    elif row['store_city'] == 'Camacho' and row['store_state'] == 'Zacatecas':
+        return 1509
+    elif row['store_city'] == 'Guadalajara' and row['store_state'] == 'Jalisco':
+        return 1859
+    elif row['store_city'] == 'Acapulco' and row['store_state'] == 'Guerrero':
+        return 1494
+    elif row['store_city'] == 'Vancouver' and row['store_state'] == 'BC':
+        return 5346
+    elif row['store_city'] == 'Victoria' and row['store_state'] == 'BC':
+        return 4324
+df['cst_living_fam_4_mthly_city_EXTERNAL'] = df.apply(lambda row: categorise(row), axis=1)
+
+#add National AVERAGE external cost living total with rent family of 4 per month by city
+def categorise(row):
+    if row['sales_country'] == 'USA':
+        return 6310
+    elif row['sales_country'] == 'Mexico':
+        return 2208
+    elif row['sales_country'] == 'Canada':
+        return 5231
+df['AVG_cst_living_fam_4_mthly_national_EXTERNAL'] = df.apply(lambda row: categorise(row), axis=1)
+
+
+#Add External Variable cost of milk by city
+def categorise(row):
+    if row['store_city'] == 'Portland' and row['store_state'] == 'OR':
+        return 0.97
+    elif row['store_city'] == 'Salem' and row['store_state'] == 'OR':
+        return 0.8
+    elif row['store_city'] == 'Beverly Hills' and row['store_state'] == 'CA':
+        return 2.06
+    elif row['store_city'] == 'Los Angeles' and row['store_state'] == 'CA':
+        return 1.14
+    elif row['store_city'] == 'San Francisco' and row['store_state'] == 'CA':
+        return 1.36
+    elif row['store_city'] == 'Bellingham' and row['store_state'] == 'WA':
+        return 0.83
+    elif row['store_city'] == 'Seattle' and row['store_state'] == 'WA':
+        return 1.07
+    elif row['store_city'] == 'Spokane' and row['store_state'] == 'WA':
+        return 0.83
+    elif row['store_city'] == 'Tacoma' and row['store_state'] == 'WA':
+        return 0.8
+    elif row['store_city'] == 'Bremerton' and row['store_state'] == 'WA':
+        return 0.88
+    elif row['store_city'] == 'Orizaba' and row['store_state'] == 'Veracruz':
+        return 1.04   
+    elif row['store_city'] == 'Merida' and row['store_state'] == 'Yucatan':
+        return 1.21
+    elif row['store_city'] == 'Hidalgo' and row['store_state'] == 'Zacatecas':
+        return 0.98
+    elif row['store_city'] == 'Mexico City' and row['store_state'] == 'DF':
+        return 1.21
+    elif row['store_city'] == 'Camacho' and row['store_state'] == 'Zacatecas':
+        return 0.98
+    elif row['store_city'] == 'Guadalajara' and row['store_state'] == 'Jalisco':
+        return 1.09
+    elif row['store_city'] == 'Acapulco' and row['store_state'] == 'Guerrero':
+        return 0.95
+    elif row['store_city'] == 'Vancouver' and row['store_state'] == 'BC':
+        return 2.1
+    elif row['store_city'] == 'Victoria' and row['store_state'] == 'BC':
+        return 2.84
+df['milk_1L_1qt_EXTERNAL'] = df.apply(lambda row: categorise(row), axis=1)
+
+
+#Add External Variable cost of bread by city
+def categorise(row):
+    if row['store_city'] == 'Portland' and row['store_state'] == 'OR':
+        return 2.63
+    elif row['store_city'] == 'Salem' and row['store_state'] == 'OR':
+        return 2.54
+    elif row['store_city'] == 'Beverly Hills' and row['store_state'] == 'CA':
+        return 5.27
+    elif row['store_city'] == 'Los Angeles' and row['store_state'] == 'CA':
+        return 2.95
+    elif row['store_city'] == 'San Francisco' and row['store_state'] == 'CA':
+        return 4.13
+    elif row['store_city'] == 'Bellingham' and row['store_state'] == 'WA':
+        return 3.46
+    elif row['store_city'] == 'Seattle' and row['store_state'] == 'WA':
+        return 3.27
+    elif row['store_city'] == 'Spokane' and row['store_state'] == 'WA':
+        return 2.17
+    elif row['store_city'] == 'Tacoma' and row['store_state'] == 'WA':
+        return 2.78
+    elif row['store_city'] == 'Bremerton' and row['store_state'] == 'WA':
+        return 2.44
+    elif row['store_city'] == 'Orizaba' and row['store_state'] == 'Veracruz':
+        return 1.36   
+    elif row['store_city'] == 'Merida' and row['store_state'] == 'Yucatan':
+        return 1.21
+    elif row['store_city'] == 'Hidalgo' and row['store_state'] == 'Zacatecas':
+        return 1.74
+    elif row['store_city'] == 'Mexico City' and row['store_state'] == 'DF':
+        return 1.5
+    elif row['store_city'] == 'Camacho' and row['store_state'] == 'Zacatecas':
+        return 1.74
+    elif row['store_city'] == 'Guadalajara' and row['store_state'] == 'Jalisco':
+        return 1.39
+    elif row['store_city'] == 'Acapulco' and row['store_state'] == 'Guerrero':
+        return 1.72
+    elif row['store_city'] == 'Vancouver' and row['store_state'] == 'BC':
+        return 2.46
+    elif row['store_city'] == 'Victoria' and row['store_state'] == 'BC':
+        return 2.26
+df['bread_0.5kg_1.1lb_EXTERNAL'] = df.apply(lambda row: categorise(row), axis=1)
+
+
+#Add External Variable cost of eggs by city
+def categorise(row):
+    if row['store_city'] == 'Portland' and row['store_state'] == 'OR':
+        return 3.97
+    elif row['store_city'] == 'Salem' and row['store_state'] == 'OR':
+        return 1.7
+    elif row['store_city'] == 'Beverly Hills' and row['store_state'] == 'CA':
+        return 3.01
+    elif row['store_city'] == 'Los Angeles' and row['store_state'] == 'CA':
+        return 3.91
+    elif row['store_city'] == 'San Francisco' and row['store_state'] == 'CA':
+        return 4.76
+    elif row['store_city'] == 'Bellingham' and row['store_state'] == 'WA':
+        return 4.24
+    elif row['store_city'] == 'Seattle' and row['store_state'] == 'WA':
+        return 3.67
+    elif row['store_city'] == 'Spokane' and row['store_state'] == 'WA':
+        return 2.91
+    elif row['store_city'] == 'Tacoma' and row['store_state'] == 'WA':
+        return 2.6
+    elif row['store_city'] == 'Bremerton' and row['store_state'] == 'WA':
+        return 3.35
+    elif row['store_city'] == 'Orizaba' and row['store_state'] == 'Veracruz':
+        return 1.66   
+    elif row['store_city'] == 'Merida' and row['store_state'] == 'Yucatan':
+        return 1.57
+    elif row['store_city'] == 'Hidalgo' and row['store_state'] == 'Zacatecas':
+        return 1.62
+    elif row['store_city'] == 'Mexico City' and row['store_state'] == 'DF':
+        return 1.73
+    elif row['store_city'] == 'Camacho' and row['store_state'] == 'Zacatecas':
+        return 1.62
+    elif row['store_city'] == 'Guadalajara' and row['store_state'] == 'Jalisco':
+        return 1.73
+    elif row['store_city'] == 'Acapulco' and row['store_state'] == 'Guerrero':
+        return 2.04
+    elif row['store_city'] == 'Vancouver' and row['store_state'] == 'BC':
+        return 2.97
+    elif row['store_city'] == 'Victoria' and row['store_state'] == 'BC':
+        return 4.04
+df['Egg_12_EXTERNAL'] = df.apply(lambda row: categorise(row), axis=1)
+
+
+#Add National AVERAGE Basket Cost
+def categorise(row):
+    if row['sales_country'] == 'USA':
+        return 8.05
+    elif row['sales_country'] == 'Mexico':
+        return 4.43
+    elif row['sales_country'] == 'Canada':
+        return 7.71
+df['AVG_basket_cost_national_EXTERNAL'] = df.apply(lambda row: categorise(row), axis=1)
+
+
+#External: add Across Dataset AVG for Basket Cost
+df['AVG_Market_Bask_Cost_FULL_dataset_EXTERNAL'] = 4.64
+
+#---------------------------------------------------------------------
+#2)add imputed versions of external variables
+
+
+#Index: city cost living for 4 divided by national avg cost living for 4
+df['INDEX_ratio_living_citynational_EXTERNAL']=df['cst_living_fam_4_mthly_city_EXTERNAL']/df['AVG_cst_living_fam_4_mthly_national_EXTERNAL']
+
+#Difference to see amount cost living index is above or below where 1 means equal to national
+df['costliving_diffNationalIndex_EXTERNAL']=df['INDEX_ratio_living_citynational_EXTERNAL']-1
+
+#Sum of cost 3 essential items: milk, bread, eggs
+df['Basket_Cost_EXTERNAL']=df['milk_1L_1qt_EXTERNAL']+df['bread_0.5kg_1.1lb_EXTERNAL']+df['Egg_12_EXTERNAL']
+
+#Index: Basket cost (sum essential foods) of city divided by national average
+df['INDEX_Basket_citynational_EXTERNAL']=df['Basket_Cost_EXTERNAL']/df['AVG_basket_cost_national_EXTERNAL']
+
+#Difference to see amount basket index is above or below where 1 means equal to national
+df['Basket_diffNationalIndex_EXTERNAL']=df['INDEX_Basket_citynational_EXTERNAL']-1
+
+#Index: Basket cost (sum essential foods) of city divided by full dataset average
+df['INDEX_Basket_citytoALL_EXTERNAL']=df['Basket_Cost_EXTERNAL']/df['AVG_Market_Bask_Cost_FULL_dataset_EXTERNAL']
+
+#Difference to see amount basket index is above or below where 1 means equal to overall average
+df['Basket_diff_overall_EXTERNAL']=df['INDEX_Basket_citytoALL_EXTERNAL']-1
+
+#---------------------------------------------------------------------
+#3)recode income brackets (variable in original dataset)
+
+#recode avg. yearly_income to midpoint of each range
+def categorise(row):
+    if row['avg. yearly_income'] == '$10K - $30K':
+        return 20000
+    elif row['avg. yearly_income'] == '$30K - $50K':
+        return 40000
+    elif row['avg. yearly_income'] == '$50K - $70K':
+        return 60000
+    elif row['avg. yearly_income'] == '$70K - $90K':
+        return 80000
+    elif row['avg. yearly_income'] == '$90K - $110K':
+        return 100000
+    elif row['avg. yearly_income'] == '$110K - $130K':
+        return 120000
+    elif row['avg. yearly_income'] == '$130K - $150K':
+        return 140000
+    elif row['avg. yearly_income'] == '$150K +':
+        return 160000
+df['Recoded_YearlyIncome_Midpt'] = df.apply(lambda row: categorise(row), axis=1)
+
+
+#hand calculated Median and IQR using population as frequency
+df_USA_noTax=df[~df['AnnualMedianIncome_withoutTax'].isna()]
+Q1_USA_noTax=70372
+Q3_USA_noTax=79057
+IQR_USA_noTax=Q3_USA_noTax-Q1_USA_noTax
+MEDIAN_USA_noTax=70372
+OutlierBdry_Lower_USA_noTax=Q1_USA_noTax-1.5*IQR_USA_noTax
+OutlierBdry_Upper_USA_noTax=Q3_USA_noTax+1.5*IQR_USA_noTax
+
+
+
+def categorise(row):
+    if row['Recoded_YearlyIncome_Midpt'] < OutlierBdry_Lower_USA_noTax:
+        return 'Low'
+    elif row['Recoded_YearlyIncome_Midpt'] > OutlierBdry_Upper_USA_noTax:
+        return 'High'
+    else:
+        return 'Middle'
+df['income_class_USA_ONLY_noTax'] = df.apply(lambda row: categorise(row), axis=1)
+
+
+#hand calculated Median and IQR relative to each country USA 10.5%, MEX 3.8%, CA 12.5% GDP Tax
+#so mult all median incomes by appropriate % before calc, to make more like gross income in original dataset
+Q1_USA=57211
+Q3_USA=70847
+IQR_USA=Q3_USA-Q1_USA
+MEDIAN_USA=70847
+OutlierBdry_Lower_USA=Q1_USA-1.5*IQR_USA
+OutlierBdry_Upper_USA=Q3_USA+1.5*IQR_USA
+
+Q1_MEX=8370
+Q3_MEX=8370
+IQR_MEX=Q3_MEX-Q1_MEX
+MEDIAN_MEX=8370
+OutlierBdry_Lower_MEX=Q1_MEX-1.5*IQR_MEX
+OutlierBdry_Upper_MEX=Q3_MEX+1.5*IQR_MEX
+
+Q1_CAN=52512
+Q3_CAN=52512
+IQR_CAN=Q3_USA-Q1_CAN
+MEDIAN_CAN=52512
+OutlierBdry_Lower_CAN=Q1_USA-1.5*IQR_CAN
+OutlierBdry_Upper_CAN=Q3_USA+1.5*IQR_CAN
+
+def categorise(row):
+    if ((row['Recoded_YearlyIncome_Midpt'] < OutlierBdry_Lower_USA) and (row['sales_country'] == 'USA')) or ((row['Recoded_YearlyIncome_Midpt'] < OutlierBdry_Lower_MEX) and (row['sales_country'] == 'Mexico')) or ((row['Recoded_YearlyIncome_Midpt'] < OutlierBdry_Lower_CAN) and (row['sales_country'] == 'Canada')) :
+        return 'Low'
+    elif ((row['Recoded_YearlyIncome_Midpt'] > OutlierBdry_Upper_USA) and (row['sales_country'] == 'USA')) or ((row['Recoded_YearlyIncome_Midpt'] > OutlierBdry_Upper_MEX) and (row['sales_country'] == 'Mexico')) or ((row['Recoded_YearlyIncome_Midpt'] > OutlierBdry_Upper_CAN) and (row['sales_country'] == 'Canada')) :
+        return 'High'
+    else:
+        return 'Middle'
+df['income_class_within_Country'] = df.apply(lambda row: categorise(row), axis=1)
+
+
+
+
+
+
+
+#print(df.info())
+
+

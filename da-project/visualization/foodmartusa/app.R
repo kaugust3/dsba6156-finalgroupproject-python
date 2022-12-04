@@ -28,11 +28,11 @@ mytheme <- create_theme(
 )
 
 mediaprediction <- read.csv('mediaprediction.csv',stringsAsFactors = F,header=T)
-
+usasegmentaddeddataset <- read.csv('usa_segment_added_dataset.csv',stringsAsFactors = F,header=T)
+str(usasegmentaddeddataset)
 mediaprediction <- mediaprediction %>%
   mutate(recyclable_package=ifelse(recyclable_package==0,"N","Y")) %>%
   mutate(low_fat=ifelse(low_fat==0,"N","Y"))
-
 
 #Dashboard header carrying the title of the dashboard
 header <- dashboardHeader(title = "Food Mart USA")  
@@ -154,6 +154,24 @@ product_frow2 <- fluidRow(
     ,plotlyOutput("plotlowfat", height = "300px")
   )
 )
+#Cost by Income Class - USA fluid row
+incomeclass_frow1 <- fluidRow(
+  box(
+    title = "Cost vs. Income class(No Tax)"
+    ,status = "primary"
+    ,solidHeader = TRUE 
+    ,collapsible = TRUE 
+    ,plotlyOutput("plotincomeclassnotax", height = "300px")
+  ),
+  box(
+    title = "Cost vs. Income class"
+    ,status = "primary"
+    ,solidHeader = TRUE 
+    ,collapsible = TRUE 
+    ,plotlyOutput("plotincomeclass", height = "300px")
+  )
+)
+
 # combine the all fluid rows to make the body
 body <- dashboardBody(
   use_theme(mytheme), # <-- use the theme
@@ -164,11 +182,13 @@ body <- dashboardBody(
               tabPanel(title = "Customer Demography", demo_frow1,demo_frow2,demo_frow3),
               tabPanel(title = "Store Statistics",store_frow1,store_frow2),
               tabPanel(title = "Product Statistics",product_frow1,product_frow2
+              ),
+              tabPanel(title = "Segmented Average Cost By Income Type - USA",incomeclass_frow1
               )
             )
         )
 
-#completing the ui part with dashboardPage
+#completing the ui part with dashboardPageWWWWWW
 ui <- dashboardPage(title = 'Food Mart USA', header, sidebar, body, skin='blue')
 
 # create the server functions for the dashboard  
@@ -366,6 +386,8 @@ server <- function(input, output,session) {
       filter((!!sym(var)) %in% input$city) %>%
       group_by((!!sym(var)),promotion_name) %>%
       dplyr::summarise(count_promotion = n()) %>% 
+      top_n(5,count_promotion) %>%
+      arrange(promotion_name, desc(count_promotion)) %>%
       select( input$geography, promotion_name,count_promotion) %>%
       set_names( c("ctry.state.cty","promotion_name","count_promotion"))
   })
@@ -529,6 +551,68 @@ server <- function(input, output,session) {
              title = input$city)
     )
   })
+  
+  # Cost by income class(no tax) plot ----
+  agg_incomeclassnotax <- reactive({
+    req(input$city)
+    var <- input$geography
+    usasegmentaddeddataset %>%
+      filter((!!sym(var)) %in% input$city) %>%
+      group_by((!!sym(var)),income_class_USA_ONLY_noTax) %>%
+      dplyr::summarise(sum_cost = mean(cost)) %>% 
+      select( input$geography,income_class_USA_ONLY_noTax, sum_cost) %>%
+      set_names( c("ctry.state.cty","sum_cost","income_class_USA_ONLY_noTax"))
+  })
+  
+  
+  output$plotincomeclassnotax <- renderPlotly({
+    ggplotly(
+      ggplot(data = agg_incomeclassnotax(), aes(
+        x = sum_cost,
+        y = income_class_USA_ONLY_noTax,
+        fill = income_class_USA_ONLY_noTax
+      )) +
+        geom_bar(stat = "identity", position = position_dodge()) +
+        theme_light() +
+        theme(panel.grid.major.x = element_blank(),panel.grid.minor.x = element_blank()) +
+        theme(axis.text.x = element_text(angle = 90))+
+        labs(x = "Cost",
+             y="",
+             title = input$city)
+    )
+  })
+
+  
+  # Cost by income class(no tax) plot ----
+  agg_incomeclass <- reactive({
+    req(input$city)
+    var <- input$geography
+    usasegmentaddeddataset %>%
+      filter((!!sym(var)) %in% input$city) %>%
+      group_by((!!sym(var)),income_class_within_Country) %>%
+      dplyr::summarise(sum_cost = mean(cost)) %>% 
+      select( input$geography,income_class_within_Country, sum_cost) %>%
+      set_names( c("ctry.state.cty","sum_cost","income_class_within_Country"))
+  })
+  
+  
+  output$plotincomeclass <- renderPlotly({
+    ggplotly(
+      ggplot(data = agg_incomeclass(), aes(
+        x = sum_cost,
+        y = income_class_within_Country,
+        fill = income_class_within_Country
+      )) +
+        geom_bar(stat = "identity", position = position_dodge()) +
+        theme_light() +
+        theme(panel.grid.major.x = element_blank(),panel.grid.minor.x = element_blank()) +
+        theme(axis.text.x = element_text(angle = 90))+
+        labs(x = "Cost",
+             y="",
+             title = input$city)
+    )
+  })
+  
   
   #some data manipulation to derive the values of KPI boxes
   total.sales <- sum(mediaprediction$store_sales.in.millions.)
